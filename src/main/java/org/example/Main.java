@@ -5,5 +5,6 @@ package org.example;
 public class Main {
     public static void main(String[] args) {
         System.out.println("Alright mate");
+        System.out.println("I fucking hate my life and coding ");
     }
 }
