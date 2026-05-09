@@ -1,0 +1,78 @@
+package DAO;
+
+import DTO.Order;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+public class OrderDAOImpl implements OrderDAO{
+
+    public final String FILE_PATH = "src/UserOrders/Orders_";
+    public static final String DELIMITER = "::";
+    public Map<String, Set<Order>> orderMap = new HashMap<>();
+
+    public String marshallOrder(Order order) {
+        String orderAsText = order.orderNumber + DELIMITER;
+        orderAsText += order.customerName + DELIMITER;
+        orderAsText += order.state + DELIMITER;
+        orderAsText += order.taxRate + DELIMITER;
+        orderAsText += order.productType + DELIMITER;
+        orderAsText += order.area + DELIMITER;
+        orderAsText += order.costPerSquareFoot + DELIMITER;
+        orderAsText += order.laborCostPerSquareFoot + DELIMITER;
+        orderAsText += order.materialCost + DELIMITER;
+        orderAsText += order.laborCost + DELIMITER;
+        orderAsText += order.tax + DELIMITER;
+        orderAsText += order.total;
+        return orderAsText;
+    }
+
+    public void writeOrder(String date) throws FlooringPersistenceException{
+        String dateAsString = "";
+        for(char c : date.toCharArray()) {
+            if(c != '/') dateAsString += c;
+        }
+
+        PrintWriter out;
+
+        try {
+            FileWriter fileWriter = new FileWriter(FILE_PATH + dateAsString);
+            out = new PrintWriter(fileWriter);
+        } catch(IOException e) {
+            throw new FlooringPersistenceException("Could not save data");
+        }
+
+        Set<Order> orderSet = orderMap.get(date);
+
+        for(Order o : orderSet) {
+            String marshalledOrder = marshallOrder(o);
+            out.println(marshalledOrder);
+            out.flush();
+        }
+
+        out.close();
+    }
+
+    public void addOrder(String date, Order order) throws FlooringPersistenceException{
+        // Put object into program memory
+        // Put program memory into secondary storage
+        if(orderMap.containsKey(date)) {
+            Set<Order> orderSet = orderMap.get(date);
+            order.orderNumber = orderSet.size() + 1;
+            orderSet.add(order);
+            orderMap.put(date, orderSet);
+        } else {
+            Set<Order> orderSet = new HashSet<>();
+            order.orderNumber = 1;
+            orderSet.add(order);
+            orderMap.put(date, orderSet);
+        }
+        this.writeOrder(date);
+    }
+}
