@@ -12,6 +12,7 @@ import UI.FlooringView;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 public class Controller {
 
@@ -26,7 +27,7 @@ public class Controller {
             int menuSelection = getMenuSelection();
             switch(menuSelection) {
                 case 1:
-                    System.out.println("Order date");
+                    getOrders();
                     break;
                 case 2:
                     addOrder();
@@ -52,9 +53,6 @@ public class Controller {
         return view.printMenuSelection();
     }
 
-    public void displayOrder() {
-
-    }
 
     public void addOrder() {
         view.addOrderBanner();
@@ -103,6 +101,17 @@ public class Controller {
 
 
 
+    }
+
+    public void getOrders() {
+        try {
+            String userDate = view.getDateFromUser();
+            LocalDate validatedDate = service.validateDate(userDate);
+            List<Order> orderList = service.getOrders(userDate);
+            view.displayOrders(orderList);
+        } catch(FlooringDataValidationException | FlooringPersistenceException e) {
+            view.displayErrorMessages(e.getMessage() + " try again");
+        }
     }
 
     public void editOrder() {

@@ -23,6 +23,10 @@ public class FlooringServiceLayerImpl implements FlooringServiceLayer {
         orderDAO.addOrder(date, order);
     }
 
+    public List<Order> getOrders(String date) throws FlooringPersistenceException {
+        return orderDAO.getOrders(date);
+    }
+
     // getStateInfo returns the whole TaxObject (Should really be called getTaxesInfo
     public Taxes getStateInfo(String state) throws FlooringPersistenceException, FlooringDataValidationException{
         return taxesDao.getTaxesInfo(state);
