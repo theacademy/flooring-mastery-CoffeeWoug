@@ -6,10 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class OrderDAOImpl implements OrderDAO{
 
@@ -74,5 +71,15 @@ public class OrderDAOImpl implements OrderDAO{
             orderMap.put(date, orderSet);
         }
         this.writeOrder(date);
+    }
+
+    public List<Order> getOrders(String date) throws FlooringPersistenceException{
+        if(!orderMap.isEmpty() && !date.isEmpty() && orderMap.containsKey(date)) {
+            Set<Order> orderSet = orderMap.get(date);
+            List<Order> orderList = new ArrayList<>(orderSet);
+            return orderList;
+        } else {
+            throw new FlooringPersistenceException("No orders for this date");
+        }
     }
 }

@@ -1,8 +1,10 @@
 package UI;
 
+import DTO.Order;
 import DTO.Product;
 
 import java.util.List;
+import java.util.Objects;
 
 public class FlooringView {
 
@@ -48,6 +50,13 @@ public class FlooringView {
 
     public String getAreaFromUser() {
         return io.readString("Please enter the area for your flooring option");
+    }
+
+    public void displayOrders(List<Order> orders) {
+        displayDashes();
+        for(Order o : orders) {
+            io.print(o.toString());
+        }
     }
 
     public void displayErrorMessages(String errorMessage) {
