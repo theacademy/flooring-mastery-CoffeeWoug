@@ -1,51 +1,49 @@
 package Controller;
 
-import UI.FlooringView;
-import UI.UserIO;
-import UI.UserIOConsoleImpl;
+import DAO.FlooringPersistenceException;
+import DTO.Order;
+import DTO.Product;
+import DTO.Taxes;
+import Service.FlooringDataValidationException;
+import Service.FlooringServiceLayer;
+import Service.FlooringServiceLayerImpl;
 
-import java.time.DateTimeException;
+import UI.FlooringView;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.InputMismatchException;
 
 public class Controller {
 
-    public Controller() {
-        // Need to implement DI
-    }
-
-    FlooringView view = new FlooringView();
-    UserIO io = new UserIOConsoleImpl();
+    public FlooringView view = new FlooringView();
+    public FlooringServiceLayer service = new FlooringServiceLayerImpl();
 
     public void run() {
+
         boolean running = true;
 
         while(running) {
-            int userMenuSelection = getMenuSelection();
-            switch (userMenuSelection) {
+            int menuSelection = getMenuSelection();
+            switch(menuSelection) {
                 case 1:
-                    io.print("Display Orders");
+                    System.out.println("Order date");
                     break;
                 case 2:
                     addOrder();
                     break;
                 case 3:
-                    io.print("Edit an order");
+                    System.out.println("Edit an Order");
                     break;
                 case 4:
-                    io.print("Remove an order");
+                    System.out.println("Remove an Order");
                     break;
                 case 5:
-                    io.print("Export all data");
+                    System.out.println("Export All Data");
                     break;
                 case 6:
-                    io.print("Quit");
+                    System.out.println("Quit");
                     running = false;
                     break;
-                default:
-                    io.print("7. Menu option not valid");
             }
         }
     }
@@ -54,30 +52,105 @@ public class Controller {
         return view.printMenuSelection();
     }
 
-    public void addOrder() {
-        LocalDate userDate = validateDate();
+    public void displayOrder() {
+
     }
 
-    // CHECKS IF DATE IS VALID FORMAT AND IS AFTER TODAY
-    public LocalDate validateDate() {
-        boolean dateValidated = false;
-        LocalDate todayDate = LocalDate.now();
+    public void addOrder() {
+        view.addOrderBanner();
+        boolean hasErrors = false;
 
-        while(!dateValidated) {
-            // Get String date from User
+        do {
+            // Asking user for Date, Customer Name and US State
+            String userDate = view.getDateFromUser();
+            String userCustomerName = view.getCustomerNameFromUser();
+            String userState = view.getStateFromUser();
+            view.displaySpace();
             try {
-                String userDate = view.getDateFromUser();
-                LocalDate ld = LocalDate.parse(userDate, DateTimeFormatter.ofPattern("MM/dd/yyyy"));
-                if (ld.isAfter(todayDate)) {
-                    System.out.println("Date is after");
-                    dateValidated = true;
-                } else if (ld.isBefore(todayDate)) {
-                    System.out.println("Date is before");
-                }
-            } catch(InputMismatchException | DateTimeException e) {
-                io.print("Not valid date");
+                // Validating the Date, Customer Name and US State
+                LocalDate validatedDate = validateDate(userDate);
+                String validatedCustomerName = validateName(userCustomerName);
+                String validatedState = validateState(userState);
+                BigDecimal validatedStateTaxRate = validateStateTaxRate(validatedState);
+
+                // Validate product selection, and area
+                view.productSelection(service.getProducts());
+                String userProduct = view.getProductFromUser();
+                Product validatedProduct = service.validateProduct(userProduct, service.getProducts());
+                String userArea = view.getAreaFromUser();
+                BigDecimal validatedArea = validateArea(userArea);
+
+                // Creating order to add to in program memory
+                Order order = new Order();
+                order.orderDate = validatedDate;
+                order.customerName = validatedCustomerName;
+                order.state = validatedState;
+                order.taxRate = validatedStateTaxRate;
+                order.productType = validatedProduct.productType;
+                order.area = validatedArea;
+                order.costPerSquareFoot = validatedProduct.costPerSquareFoot;
+                order.laborCostPerSquareFoot = validatedProduct.laborCostPerSquareFoot;
+                order.calculateAllCosts();
+
+                service.addOrder(userDate, order);
+                hasErrors = false;
+
+            } catch (FlooringDataValidationException | FlooringPersistenceException e) {
+                view.displayErrorMessages(e.getMessage() + " try again");
+                hasErrors = true;
             }
-        }
-        return LocalDate.now();
+        } while(hasErrors);
+
+
+
+    }
+
+    public void editOrder() {
+
+    }
+
+    public void removeOrder() {
+
+    }
+
+    public void exportData() {
+
+    }
+
+    public void unknownCommand() {
+
+    }
+
+    public void exitMessage() {
+
+    }
+
+    public LocalDate validateDate(String date) throws FlooringDataValidationException {
+        return service.validateDate(date);
+    }
+
+    public String validateName(String userName) throws FlooringDataValidationException {
+        return service.validateName(userName);
+    }
+
+    public String validateState(String state) throws FlooringPersistenceException, FlooringDataValidationException {
+        return service.validateState(state);
+    }
+
+    // Different to the UML
+    public BigDecimal validateStateTaxRate(String state) throws FlooringPersistenceException, FlooringDataValidationException{
+        Taxes taxObj = service.getStateInfo(state);
+        return taxObj.taxRate;
+    }
+
+    public BigDecimal validateArea(String userArea) throws FlooringDataValidationException{
+        return service.validateArea(userArea);
     }
 }
+
+/*
+System.out.println("Valid date " + validatedDate);
+System.out.println("Valid name " + validatedCustomerName);
+System.out.println("Valid state " + validatedState);
+System.out.println("Valid state tax rate " + validateStateTaxRate(validatedState));
+ */
