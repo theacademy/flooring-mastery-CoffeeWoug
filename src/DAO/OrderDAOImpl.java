@@ -73,6 +73,10 @@ public class OrderDAOImpl implements OrderDAO{
         this.writeOrder(date);
     }
 
+    public void editOrder(String date, Order order) throws FlooringPersistenceException{
+        this.writeOrder(date);
+    }
+
     public List<Order> getOrders(String date) throws FlooringPersistenceException{
         if(!orderMap.isEmpty() && !date.isEmpty() && orderMap.containsKey(date)) {
             Set<Order> orderSet = orderMap.get(date);
@@ -81,5 +85,18 @@ public class OrderDAOImpl implements OrderDAO{
         } else {
             throw new FlooringPersistenceException("No orders for this date");
         }
+    }
+
+    public Order getOrder(String date, int orderNumber) throws FlooringPersistenceException{
+        Set<Order> orderSet = orderMap.get(date);
+        if(orderMap.containsKey(date)) {
+            for(Order o : orderSet) {
+                if(o.orderNumber == orderNumber) {
+                    return o;
+                }
+            }
+            throw new FlooringPersistenceException("No Order found for this date and number");
+        }
+        throw new FlooringPersistenceException("No Order found for this date and number");
     }
 }
