@@ -33,7 +33,7 @@ public class Controller {
                     addOrder();
                     break;
                 case 3:
-                    System.out.println("Edit an Order");
+                    editOrder();
                     break;
                 case 4:
                     System.out.println("Remove an Order");
@@ -45,6 +45,8 @@ public class Controller {
                     System.out.println("Quit");
                     running = false;
                     break;
+                default:
+                    view.displayErrorMessages("Not a valid menu option, try again");
             }
         }
     }
@@ -115,7 +117,48 @@ public class Controller {
     }
 
     public void editOrder() {
+        try {
+            // Get and validate date from user
+            String userDate = view.getDateFromUser();
+            service.validateDate(userDate);
+            int userOrderNumber = view.getOrderNumber();
+            Order orderToEdit = service.checkDateAndOrderNumber(userDate, userOrderNumber);
 
+            // User edited fields and check validation
+            view.printObjectVariable(orderToEdit, 1);
+            String editedCustomerName = view.getCustomerNameFromUser();
+            view.printObjectVariable(orderToEdit, 2);
+            String editedState = view.getStateFromUser();
+            view.productSelection(service.getProducts());
+            view.printObjectVariable(orderToEdit, 3);
+            String editedProductType = view.getProductFromUser();
+            view.printObjectVariable(orderToEdit, 4);
+            String editedArea = view.getAreaFromUser();
+
+            // Putting fields into edited object
+            if(!editedCustomerName.isEmpty()) orderToEdit.customerName = service.validateName(editedCustomerName);
+            if(!editedState.isEmpty()) {
+                orderToEdit.state = service.validateState(editedState);
+                orderToEdit.taxRate = validateStateTaxRate(editedState);
+            }
+            if(!editedProductType.isEmpty()) {
+                Product product = service.validateProduct(editedProductType, service.getProducts());
+                orderToEdit.productType = product.productType;
+                orderToEdit.costPerSquareFoot = product.costPerSquareFoot;
+                orderToEdit.laborCostPerSquareFoot = product.laborCostPerSquareFoot;
+            }
+            if(!editedArea.isEmpty()) {
+                BigDecimal decimalArea = service.validateArea(editedArea);
+                orderToEdit.area = decimalArea;
+            }
+
+            // Order recalculated everything
+            orderToEdit.calculateAllCosts();
+            service.editOrder(userDate, orderToEdit);
+
+        } catch(FlooringDataValidationException | FlooringPersistenceException e) {
+            view.displayErrorMessages(e.getMessage() + " try again");
+        }
     }
 
     public void removeOrder() {

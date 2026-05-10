@@ -31,6 +31,22 @@ public class FlooringView {
             displayDashes();
         }
     }
+    public void printObjectVariable(Order order, int objectVariable) {
+        switch(objectVariable) {
+            case 1:
+                io.print("Previous orders customer name " + order.customerName);
+                break;
+            case 2:
+                io.print("Previous orders US state " + order.state);
+                break;
+            case 3:
+                io.print("Previous orders product type " + order.productType);
+                break;
+            case 4:
+                io.print("Previous orders area " + order.area.toString());
+                break;
+        }
+    }
 
     public String getDateFromUser() {
         return io.readString("Enter Order date");
@@ -50,6 +66,10 @@ public class FlooringView {
 
     public String getAreaFromUser() {
         return io.readString("Please enter the area for your flooring option");
+    }
+
+    public int getOrderNumber() {
+        return io.readInt("Please enter order number");
     }
 
     public void displayOrders(List<Order> orders) {
