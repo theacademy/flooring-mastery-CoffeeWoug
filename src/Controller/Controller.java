@@ -39,7 +39,7 @@ public class Controller {
                     removeOrder();
                     break;
                 case 5:
-                    System.out.println("Export All Data");
+                    exportData();
                     break;
                 case 6:
                     System.out.println("Quit");
@@ -179,7 +179,11 @@ public class Controller {
     }
 
     public void exportData() {
-
+        try {
+            service.exportOrders();
+        } catch (FlooringPersistenceException e) {
+            view.displayErrorMessages(e.getMessage() + " something went wrong");
+        }
     }
 
     public void unknownCommand() {

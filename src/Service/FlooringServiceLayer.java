@@ -15,6 +15,7 @@ public interface FlooringServiceLayer {
     public List<Order> getOrders(String date) throws FlooringPersistenceException;
     public void editOrder(String date, Order order) throws FlooringPersistenceException;
     public void deleteOrder(String date, int orderNumber) throws FlooringPersistenceException;
+    public void exportOrders() throws FlooringPersistenceException;
     public Taxes getStateInfo(String state) throws FlooringPersistenceException, FlooringDataValidationException;
     public LocalDate validateDate(String date) throws FlooringDataValidationException;
     public String validateName(String userName) throws FlooringDataValidationException;

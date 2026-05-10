@@ -111,4 +111,27 @@ public class OrderDAOImpl implements OrderDAO{
         orderMap.put(date, orderSet);
         this.writeOrder(date);
     }
+
+    public void exportOrders() throws FlooringPersistenceException {
+        PrintWriter out;
+
+        try {
+            FileWriter fileWriter = new FileWriter("/home/mihirmistry/Downloads/Orders");
+            out = new PrintWriter(fileWriter);
+        } catch (IOException e) {
+            throw new FlooringPersistenceException("Error when creating an export file");
+        }
+
+        if(!orderMap.isEmpty()) {
+            for(Set<Order> set : orderMap.values()) {
+                for(Order o : set) {
+                    String marshalledOrder = marshallOrder(o);
+                    out.println(marshalledOrder);
+                    out.flush();
+                }
+
+            }
+        }
+        out.close();
+    }
  }

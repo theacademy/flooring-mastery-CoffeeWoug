@@ -11,5 +11,5 @@ public interface OrderDAO {
    public Order getOrder(String date, int orderNumber) throws FlooringPersistenceException;
     public void editOrder(String date, Order order) throws FlooringPersistenceException;
     public void deleteOrder(String date, int orderNumber) throws FlooringPersistenceException;
-
+    public void exportOrders() throws FlooringPersistenceException;
 }
