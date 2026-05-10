@@ -99,4 +99,16 @@ public class OrderDAOImpl implements OrderDAO{
         }
         throw new FlooringPersistenceException("No Order found for this date and number");
     }
-}
+
+    public void deleteOrder(String date, int orderNumber) throws FlooringPersistenceException {
+        Set<Order> orderSet = orderMap.get(date);
+        for(Order o : orderSet) {
+            if(o.orderNumber == orderNumber) {
+                orderSet.remove(o);
+                break;
+            }
+        }
+        orderMap.put(date, orderSet);
+        this.writeOrder(date);
+    }
+ }
