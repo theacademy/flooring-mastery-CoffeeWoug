@@ -36,7 +36,7 @@ public class Controller {
                     editOrder();
                     break;
                 case 4:
-                    System.out.println("Remove an Order");
+                    removeOrder();
                     break;
                 case 5:
                     System.out.println("Export All Data");
@@ -92,7 +92,11 @@ public class Controller {
                 order.laborCostPerSquareFoot = validatedProduct.laborCostPerSquareFoot;
                 order.calculateAllCosts();
 
-                service.addOrder(userDate, order);
+                boolean confirmAddOrder = view.getConfirmation();
+                if(confirmAddOrder) {
+                    service.addOrder(userDate, order);
+                }
+
                 hasErrors = false;
 
             } catch (FlooringDataValidationException | FlooringPersistenceException e) {
@@ -162,7 +166,16 @@ public class Controller {
     }
 
     public void removeOrder() {
+        try {
+            String userDate = view.getDateFromUser();
+            service.validateDate(userDate);
+            int orderNumber = view.getOrderNumber();
+            Order order = service.checkDateAndOrderNumber(userDate, orderNumber);
+            service.deleteOrder(userDate, orderNumber);
 
+        } catch (FlooringPersistenceException | FlooringDataValidationException e) {
+            view.displayErrorMessages(e.getMessage() + " try again");
+        }
     }
 
     public void exportData() {

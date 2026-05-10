@@ -72,6 +72,15 @@ public class FlooringView {
         return io.readInt("Please enter order number");
     }
 
+    public boolean getConfirmation() {
+        String userInput = io.readString("Confirm request, type Yes or No");
+        while(!userInput.equals("Yes") && !userInput.equals("No")) {
+            userInput = io.readString("Incorrect try again");
+        }
+        if(userInput.equals("Yes")) return true;
+        else {return false;}
+    }
+
     public void displayOrders(List<Order> orders) {
         displayDashes();
         for(Order o : orders) {
