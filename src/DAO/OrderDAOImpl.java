@@ -10,9 +10,17 @@ import java.util.*;
 
 public class OrderDAOImpl implements OrderDAO{
 
-    public final String FILE_PATH = "src/UserOrders/Orders_";
+    public final String FILE_PATH;
     public static final String DELIMITER = "::";
     public Map<String, Set<Order>> orderMap = new HashMap<>();
+
+    public OrderDAOImpl() {
+        this.FILE_PATH = "src/UserOrders/Orders_";
+    }
+
+    public OrderDAOImpl(String filePath) {
+        this.FILE_PATH  = filePath;
+    }
 
     public String marshallOrder(Order order) {
         String orderAsText = order.orderNumber + DELIMITER;
