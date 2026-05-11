@@ -5,7 +5,9 @@ import DTO.Order;
 import java.io.FileWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -92,11 +94,16 @@ public class OrderDAOImplTest {
         testDao.addOrder(date, expectedOrder);
         testDao.addOrder(secondDate, expectedOrder2);
 
-        List<Order> expectedOrders = new ArrayList<>();
-        expectedOrders.add(expectedOrder);
-        expectedOrders.add(expectedOrder2);
-        List<Order> orders = testDao.getOrders(date);
-        assertEquals(expectedOrder, orders);
+        Set<Order> orderSet = new HashSet<>();
+        orderSet.add(expectedOrder);
+        orderSet.add(expectedOrder2);
+        List<Order> expectedOrders = new ArrayList<>(orderSet);
+
+        List<Order> resultOrder = testDao.getOrders(date);
+        testDao.addOrder(date, expectedOrder);
+        testDao.addOrder(secondDate, expectedOrder2);
+
+        assertEquals(expectedOrders, resultOrder);
     }
 
     @org.junit.jupiter.api.Test
